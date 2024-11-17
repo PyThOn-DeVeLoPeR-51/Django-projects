@@ -1,0 +1,8 @@
+{% for news in news_list %}
+
+    <div>
+        <h1><a href="{% url 'news_detail_page' news.pk %}">{{news.title}}</a></h1>
+        <p>{{ news.publish_time}}</p>
+    </div>
+
+{% endfor %}
