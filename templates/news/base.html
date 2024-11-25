@@ -36,9 +36,27 @@
               <li><a href="{% url 'home_page' %}">Home</a></li>
               <li><a href="#">About</a></li>
               <li><a href="{% url 'contact_page' %}">Contact</a></li>
+
+              {% if request.user.is_superuser %}
+              <li><a href="{% url 'admin_page' %}">ADMIN PAGE</a></li>
+              {% endif %}
+
             </ul>
           </div>
           <div class="header_top_right">
+
+            {% if request.user.is_authenticated %}
+              <p><a href="{% url 'logout' %}" style="color: yellow">LOGOUT</a></p>
+            {% else %}
+              <p><a href="{% url 'user_register' %}" style="color: yellow">SIGNUP</a></p>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+              <p><a href="{% url 'user_profile' %}" style="color: yellow">MY PROFILE</a></p>
+            {% else %}
+              <p><a href="{% url 'login' %}" style="color: yellow">LOGIN</a></p>
+            {% endif %}
+
             <p>{% now "js F Y H:i" %}</p>
           </div>
         </div>
@@ -64,6 +82,11 @@
           <li><a href="{% url 'techno_news_page' %}">Texnologiya</a></li>
           <li><a href="{% url 'sport_news_page' %}">Sport</a></li>
           <li><a href="{% url 'contact_page' %}">Biz bilan aloqa</a></li>
+          <li>
+            <form action="{% url 'search_results' %}" method="get">{% csrf_token %}
+              <input type="search" name="q" placeholder="Search..." class="form-control" style="margin-top: 7px">
+            </form>
+          </li>
         </ul>
       </div>
     </nav>

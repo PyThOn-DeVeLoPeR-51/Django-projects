@@ -1,5 +1,6 @@
 {% extends 'news/base.html' %}
 {% load static %}
+{% load hitcount_tags %}
 
 {% block title %} {{ news.title }} {% endblock title %}
 
@@ -14,16 +15,53 @@
             <ol class="breadcrumb">
               <li><a href="{% url 'home_page' %}">Home</a></li>
 
-              <li><a href="#">Category</a></li>
+              {% for category in categories %}
+                  <li><a href="#">{{category.name}}</a></li>
+
+              {% endfor %}
 
               <li class="active"></li>
             </ol>
             <h1>{{ news.title }}</h1>
-            <div class="post_commentbox"> <a href="#"><i class="fa fa-user"></i>Wpfreeware</a> <span><i class="fa fa-calendar"></i>{{ news.publish_time }}</span> <a href="#"><i class="fa fa-tags"></i>{{ category.name }}</a> </div>
+            <div class="post_commentbox"> <a href="#"><i class="fa fa-user"></i>Comments: {{ comment_count }}</a> <span><i class="fa fa-calendar"></i>{{ news.publish_time }}</span> <span><i class="fa fa-eye" aria-hidden="true"></i>{% get_hit_count for news %}</span> </div>
             <div class="single_page_content"> <img class="img-center" src="{{ news.image.url }}" alt="">
               <p>{{ news.body }}</p>
+
+              {% if request.user.is_authenticated and request.user.is_superuser %}
+              <a href="{% url 'edit_news' news.slug %}"><button class="btn btn-info">UPDATE</button></a>
+              <a href="{% url 'delete_news' news.slug %}"><button class="btn btn-danger">DELETE</button></a>
+              {% endif %}
+              <hr>
+
+              <h2 class="font-weight-bold">COMMENTS: {{ comment_count }}</h2>
+              {% for comment in comments %}
+                <div class="comments">
+                  <h5 class="font-weight-bold">
+                    {{ comment.user }}
+                    <span class="text-muted font-weight-normal" >{{ comment.created_time }}</span>
+                  </h5>
+                  <p>{{ comment.body }}</p>
+                  <hr>
+                </div>
+              {% endfor %}
+
             </div>
           </div>
+
+           <div class="contact_area">
+            <h2>Write Comments</h2>
+
+             {% if request.user.is_authenticated %}
+              <form class="contact_form" method="post">{% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" class="btn btn-success">SAVE COMMENT</button>
+              </form>
+             {% else %}
+              <p>PLease, Login</p>
+             {% endif %}
+
+          </div>
+
         </div>
       </div>
       <nav class="nav-slit"> <a class="prev" href="#"> <span class="icon-wrap"><i class="fa fa-angle-left"></i></span>
@@ -44,7 +82,10 @@
               {% for news in latest_news %}
               <li>
                 <div class="media wow fadeInDown"> <a href="single_page.html" class="media-left"> <img alt="" src="{{ news.image.url }}"> </a>
-                  <div class="media-body"> <a href="single_page.html" class="catg_title"> Aliquam malesuada diam eget turpis varius 1</a> </div>
+                  <div class="media-body">
+                    <a href="single_page.html" class="catg_title"> {{ news.title }}</a>
+                    <p style="font-style: italic">views: <i class="fa fa-eye" aria-hidden="true"></i>{% get_hit_count for news %}</p>
+                  </div>
                 </div>
               </li>
               {% endfor %}
